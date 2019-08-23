@@ -11,8 +11,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Globals Initialisation
 //
-DWORD g_dwSwapAltCmd = 0;
-DWORD g_dwSwapFnCtrl = 0;
+// DWORD g_dwSwapAltCmd = 0;
+// DWORD g_dwSwapFnCtrl = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Driver Entry
@@ -34,6 +34,8 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject, IN PUNICODE_STRING registry
 
 	ReadDriverRegistryValue(registryPath, REG_DWORD, L"SwapAltCmd", (void*)&g_dwSwapAltCmd);
 	ReadDriverRegistryValue(registryPath, REG_DWORD, L"SwapFnCtrl", (void*)&g_dwSwapFnCtrl);
+	ReadDriverRegistryValue(registryPath, REG_DWORD, L"HookCopy", (void*)&g_dwHookCmd);
+
 
 	return STATUS_SUCCESS;
 }
