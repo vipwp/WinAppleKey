@@ -26,7 +26,7 @@ extern "C" {
 	#define DRIVERNAME "WinAppleKey"
 
 	#if defined(DBG)
-		#define DebugPrint(s, ...) DbgPrint(DRIVERNAME ": " s, __VA_ARGS__);
+		#define DebugPrint(s, ...) DbgPrint(DRIVERNAME ": " s "\n", __VA_ARGS__);
 		#define DebugPrintBuffer(text, buffer, length) KdPrintBuffer(DRIVERNAME ": " text, buffer, length);
 	#else 
 		#define DebugPrint
@@ -38,12 +38,20 @@ extern "C" {
 
 	extern DWORD g_dwSwapAltCmd;
 	extern DWORD g_dwSwapFnCtrl;
+	extern DWORD g_dwHookCmd;
 
 	enum HidCodes
 	{
 		HidKeyB = 0x5,
 		HidKeyP = 0x13,
 		HidKeyS = 0x16,
+
+		HidKeyC = 0x06,
+		HidKeyV = 0x19,
+		HidKeyZ = 0x1D,
+		HidKeyX = 0x1b,
+		HidKeyF = 0x09,
+		
 		HidF1 = 0x3a,
 		HidF2 = 0x3b,
 		HidF3 = 0x3c,
@@ -78,6 +86,8 @@ extern "C" {
 		HidDown = 0x51,
 		HidPgDown = 0x4e,
 		HidEnter = 0x28,
+		HidEscape = 0x29,
+		HidBackspace = 0x2a,
 		HidPrtScr = 0x46,
 		HidScrLck = 0x47,
 		HidPauseBreak = 0x48,
@@ -86,6 +96,13 @@ extern "C" {
 		HidRCtrlMask = 0x10,
 		HidLAltMask = 0x4,
 		HidRAltMask = 0x40,
+
+		HidUndo = 0x7a,
+		HidCut = 0x7b,
+		HidCopy = 0x7c,
+		HidPaste = 0x7d,
+		HidFind = 0x7e,
+
 		HidLCmdMask = 0x8,
 		HidRCmdMask = 0x80
 	};
@@ -106,7 +123,7 @@ extern "C" {
 	void DriverUnload(IN PDRIVER_OBJECT fido);
 	void RemoveDevice(IN PDEVICE_OBJECT fdo);
 	NTSTATUS CompleteRequest(IN PIRP Irp, IN NTSTATUS status, IN ULONG_PTR info);
-	NTSTATUS AddDevice(IN PDRIVER_OBJECT driver, IN PDEVICE_OBJECT pdo);
+	NTSTATUS WinAppleKeyAddDevice(IN PDRIVER_OBJECT driver, IN PDEVICE_OBJECT pdo);
 	NTSTATUS DispatchAny(IN PDEVICE_OBJECT fido, IN PIRP irp);
 	NTSTATUS DispatchPower(IN PDEVICE_OBJECT fido, IN PIRP irp);
 	NTSTATUS DispatchPnp(IN PDEVICE_OBJECT fido, IN PIRP irp);
@@ -115,7 +132,7 @@ extern "C" {
 	NTSTATUS UsageNotificationCompletionRoutine(PDEVICE_OBJECT fido, PIRP irp, PDEVICE_EXTENSION pdx);
 	NTSTATUS InternalIoctlComplete(IN PDEVICE_OBJECT fido, IN PIRP irp, IN PVOID context);
 	NTSTATUS DispatchInternalIoctl(IN PDEVICE_OBJECT fido, IN PIRP irp);
-	void KdPrintBuffer(PCHAR text, PUCHAR buffer, ULONG length);
+	void KdPrintBuffer(PCHAR text, BYTE* buffer, ULONG length);
 	NTSTATUS ReadDriverRegistryValue(PUNICODE_STRING registryPath, DWORD dwRegValeType, PCWSTR wcszValName, PVOID* pValue);
 
 	void ProcessA1314Block(PBRB pbrb);
