@@ -1,3 +1,6 @@
+Forked from samartzidis/WinAppleKey
+
+
 # WinAppleKey
 
 Apple Magic Keyboard Driver (model A1644) for Windows 10.
@@ -108,7 +111,7 @@ To build the driver you will need **Visual Studio 2017** along with an installat
   **Windows 10 Driver Kit (WDK)**. For the installer project, you will additionally need to install the **[WiX toolset](http://wixtoolset.org/)** version v3.11
   or better. 
 
-### Donate
+### Donate (Origin author's Account)
 
 [![donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TBM5P9X6GZRCL)
 
