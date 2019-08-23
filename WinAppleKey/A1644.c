@@ -1,14 +1,18 @@
 #include "driver.h"
-
 BOOLEAN g_FakeFnActive = 0;
+BOOLEAN leftCmdPressed = 0;
 
 void ProcessA1644Buffer(BYTE* buf, ULONG size)
 {
-	DebugPrintBuffer("ProcessA1644Buffer(): <= ", buf, size);
+	g_FakeFnActive = 0;
+	DebugPrintBuffer("ProcessA1644Buffer() ->  ", buf, size);
 
 	BYTE* pModifier = &buf[0];
 	BYTE* pKey1 = &buf[2];
 	BYTE* pSpecialKey = &buf[8];
+
+	leftCmdPressed = *pModifier & HidLCmdMask;
+	DebugPrint("left cmd Pressed  %02x, g_dwHookCmd %02x", leftCmdPressed, g_dwHookCmd);
 
 	if (g_dwSwapFnCtrl)
 	{
@@ -25,16 +29,18 @@ void ProcessA1644Buffer(BYTE* buf, ULONG size)
 	if (*pSpecialKey)
 	{
 		if (*pSpecialKey & 0x1) //Eject (translate to Del)
-			*pKey1 = HidDel; //Set Del key
+			*pKey1 = HidInsert; //Set Del key
 
-		//If we swap Fn and Ctrl
-		if (g_dwSwapFnCtrl)
-		{
-			if (*pSpecialKey & 0x2) //Fn (translate to LCtrl)
-				*pModifier |= HidLCtrlMask; //Set LCtrl modifier
+		else {
+			//If we swap Fn and Ctrl
+			if (g_dwSwapFnCtrl)
+			{
+				if (*pSpecialKey & 0x2) //Fn (translate to LCtrl)
+					* pModifier |= HidLCtrlMask; //Set LCtrl modifier
+			}
+			else
+				g_FakeFnActive = *pSpecialKey & 0x2; //Set fake Fn state based on special key state
 		}
-		else
-			g_FakeFnActive = *pSpecialKey & 0x2; //Set fake Fn state based on special key state
 
 		*pSpecialKey = 0; //Clear special key so that the buffer can be understood by hidclass up the stack	
 	}
@@ -90,17 +96,31 @@ void ProcessA1644Buffer(BYTE* buf, ULONG size)
 			case HidKeyP: *pKey1 = HidPrtScr; break;
 			case HidKeyB: *pKey1 = HidPauseBreak; break;
 			case HidKeyS: *pKey1 = HidScrLck; break;
+			case HidBackspace: *pKey1 = HidDel;break;
 			default:
 				if (*pModifier & HidLCtrlMask) //Map Fn+LCtrl to RCtrl
 				{
 					*pModifier &= ~HidLCtrlMask; //Clear LCtrl
 					*pModifier |= HidRCtrlMask; //Set RCtrl
 				}
-				else
-					RtlZeroMemory(buf, size); //Ignore all other Fn+[key] combinations
+				//else
+				//	RtlZeroMemory(buf, size); //Ignore all other Fn+[key] combinations
 				break;
 		}
 	}
-	
+
+	if (leftCmdPressed && g_dwHookCmd) {
+		DebugPrint("left pressed and hook cmd");
+		switch (*pKey1) {
+			case HidKeyC: *pKey1 = HidCopy; break;
+			case HidKeyV: *pKey1 = HidPaste; break;
+			case HidKeyZ: *pKey1 = HidUndo; break;
+			case HidKeyX: *pKey1 = HidCut; break;
+			case HidKeyF: *pKey1 = HidFind; break;
+			default:
+				break;
+		}
+	}
+	DebugPrint("key1:%02x", *pKey1);
 	DebugPrintBuffer("ProcessA1644Buffer(): => ", buf, size);
 }
