@@ -8,7 +8,7 @@ Provider=%Provider%
 CatalogFile=WinAppleKey.cat
 DriverPackageDisplayName="WinAppleKey"
 DriverPackageType=PlugAndPlay
-DriverVer=04/22/2019,1.0.6.0
+DriverVer=01/01/2020,1.0.7.0
 
 [ControlFlags]
 ExcludeFromSelect = *
@@ -97,8 +97,8 @@ ServiceBinary = %12%\WinAppleKey.sys
 AddReg = HIDKbFlt_Service_AddReg
 
 [HIDKbFlt_Service_AddReg]
-HKR,,SwapAltCmd,%REG_DWORD%, 0
-HKR,,SwapFnCtrl,%REG_DWORD%, 1
+HKR,,SwapAltCmd,0x00010003, 0
+HKR,,SwapFnCtrl,0x00010003, 1
 
 [Dri_BTH_Inst.NT.HW]
 Include = keyboard.inf
